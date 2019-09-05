@@ -88,10 +88,10 @@ targetNodes <- list('FoodProvMeat',
 
 
 ##Testing with grainquery:
-setEvidence(stH_network, nodes = names(layersDFClass), states = layersDFClass[1, ])
-querygrain(stH_network, nodes = unlist(targetNodes), evidence = setEvidence(stH_network, 
+#setEvidence(stH_network, nodes = names(layersDFClass), states = layersDFClass[1, ])
+#querygrain(stH_network, nodes = unlist(targetNodes), evidence = setEvidence(stH_network, 
                                                                             
-## See also:
+## Better method:
 testResults <- predict(object = stH_network, response = unlist(targetNodes), newdata = layersDFClass[complete.cases(layersDFClass),])
 
 predToRas <- function(x){
