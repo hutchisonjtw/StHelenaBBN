@@ -26,12 +26,17 @@ shinyServer(function(input, output) {
     }
     
     habMapRat <- createRat(habMap, habitats)
+    habMapRat$cols <- rev(brewer.pal(10, "Paired"))
+    levels(habMap)[[1]] <- habMapRat
 
     
-    habMapPlot <- reactiveValues(map = habMap, rat = habMapRat)
+    habMapPlot <- reactiveValues(map = habMap)
     
     habMapMat <- reactive(as.matrix(habMapPlot$map))
     
+    
+    
+## Plot map, with zoom if boundary drawn - tried re-writing this with rasterVis::levelplot, but it uses lattice graphics and the plotOutput brush function does not return the plot coordinates with lattice graphics so cannot be used to interact with the raster.    
     output$habMap <- renderPlot({
         par(mar = c(4,4,2,15))
         plot(habMapPlot$map, col = rev(brewer.pal(10, "Paired")), legend = FALSE, ext = plotZoom$x)
@@ -46,7 +51,7 @@ shinyServer(function(input, output) {
         brush <- input$habMap_brush
         if (!is.null(brush)) {
             plotZoom$x <- extent(c(brush$xmin, brush$xmax, brush$ymin, brush$ymax))
-            
+            habMapPlot$map = crop(habMap, plotZoom$x)
         } else {
             plotZoom$x <- NULL
         }
