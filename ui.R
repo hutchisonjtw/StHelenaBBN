@@ -3,7 +3,9 @@ library(shinydashboard)
 
 shinyUI(
     dashboardPage(
+## Header        
         dashboardHeader(title = "St Helena Natural Capital Mapping Tool", titleWidth = 400),
+## Sidebar        
         dashboardSidebar(
             width = 200,
             sidebarMenu(
@@ -11,9 +13,10 @@ shinyUI(
                 menuItem(text = "Ecosystem service maps", tabName = "outputMaps", icon = icon("leaf"))
             )
         ),
-        
+## Body
         dashboardBody(
             tabItems(
+## Landcover tab                
                 tabItem(tabName = "landcover",
                         class = "active",
                         fluidRow(
@@ -23,8 +26,8 @@ shinyUI(
                                                   click = "habMap_click",
                                                   dblclick = "habMap_dblclick",
                                                   brush = brushOpts(id = "habMap_brush", resetOnNew = TRUE)
-                                       )#,
-                                       #verbatimTextOutput("boundaryBox")
+                                       ),
+                                       verbatimTextOutput("boundaryBox")
                                    )
                             ),
                             column(width = 4,
@@ -68,6 +71,7 @@ shinyUI(
                             )
                         )
                 ),
+## Maps                
                 tabItem(tabName = "outputMaps",
                         fluidRow(
                             box(selectInput(inputId = "service",
