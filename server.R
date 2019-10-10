@@ -77,7 +77,8 @@ shinyServer(function(input, output) {
                "\nymax = ", boundary$box@ymax,
                "\nncells = ", length(boundary$cells),
                "\nfromClass = ", input$fromClass,
-               "\ntoClass = ", input$toClass
+               "\ntoClass = ", input$toClass,
+               "\nboundary2 = ", boundary2$topLeft
         )
     })
     
