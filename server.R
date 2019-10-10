@@ -17,30 +17,29 @@ shinyServer(function(input, output) {
     habitats <- data.frame(ID = 1:10, habitat = c("Native forest", "Introduced forest", "Native shrubland", 
                                                   "Introduced shrubland", "Flax", "Arable", "Pasture", 
                                                   "Plantations", "Rural gardens", "Other"))
+    habitats$cols <- rev(brewer.pal(10, "Paired"))
     
     createRat <- function(map, habitats) {
         mapFactor <- ratify(map)
         mapRat <- data.frame(ID = levels(mapFactor)[[1]])
-        mapRat$habitat <- habitats$habitat[habitats$ID == mapRat$ID]
-        return(mapRat)
+        mapRat$habitat <- habitats$habitat[match(mapRat$ID, habitats$ID)]
+        mapRat$cols <- habitats$cols[match(mapRat$ID, habitats$ID)]
+        levels(mapFactor) <- mapRat
+        return(mapFactor)
     }
     
     habMapRat <- createRat(habMap, habitats)
-    habMapRat$cols <- rev(brewer.pal(10, "Paired"))
-    levels(habMap)[[1]] <- habMapRat
-
     
-    habMapPlot <- reactiveValues(map = habMap)
+    habMapPlot <- reactiveValues(map = habMapRat)
     
     habMapMat <- reactive(as.matrix(habMapPlot$map))
-    
     
     
 ## Plot map, with zoom if boundary drawn - tried re-writing this with rasterVis::levelplot, but it uses lattice graphics and the plotOutput brush function does not return the plot coordinates with lattice graphics so cannot be used to interact with the raster.    
     output$habMap <- renderPlot({
         par(mar = c(4,4,2,15))
-        plot(habMapPlot$map, col = rev(brewer.pal(10, "Paired")), legend = FALSE, ext = plotZoom$x)
-        legend("right", legend = habMapPlot$rat$habitat, fill = rev(brewer.pal(10, "Paired")), xpd = TRUE, inset = -0.25, bty = "n")
+        plot(habMapPlot$map, col = levels(habMapPlot$map)[[1]]$cols, legend = FALSE)
+        legend("right", legend = levels(habMapPlot$map)[[1]]$habitat, fill = levels(habMapPlot$map)[[1]]$cols, xpd = TRUE, inset = -0.25, bty = "n")
     })
     
     # output$clickCoords <- renderText({
@@ -51,9 +50,12 @@ shinyServer(function(input, output) {
         brush <- input$habMap_brush
         if (!is.null(brush)) {
             plotZoom$x <- extent(c(brush$xmin, brush$xmax, brush$ymin, brush$ymax))
-            habMapPlot$map = crop(habMap, plotZoom$x)
+            croppedMap <- crop(habMap, plotZoom$x)
+            croppedMapRat <- createRat(croppedMap, habitats)
+            habMapPlot$map <- croppedMapRat
         } else {
             plotZoom$x <- NULL
+            habMapPlot$map <- habMapRat
         }
     })
     
