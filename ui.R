@@ -63,7 +63,7 @@ shinyUI(
                                                                   "Other" = 10),
                                                    selected = NULL
                                        ),
-                                       actionButton("change", "Change cells")
+                                       actionButton("btnChange", "Change cells")
                                    ), 
                                    box(width = 12,
                                        actionButton(width = "100%", "recalc", "Recalculate services")
