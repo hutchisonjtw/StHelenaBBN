@@ -26,8 +26,8 @@ shinyUI(
                                                   click = "habMap_click",
                                                   dblclick = "habMap_dblclick",
                                                   brush = brushOpts(id = "habMap_brush", resetOnNew = TRUE)
-                                       ),
-                                       verbatimTextOutput("boundaryBox")
+                                       )#,
+                                       #verbatimTextOutput("boundaryBox")
                                    )
                             ),
                             column(width = 4,
@@ -63,7 +63,8 @@ shinyUI(
                                                                   "Other" = 10),
                                                    selected = NULL
                                        ),
-                                       actionButton("btnChange", "Change cells")
+                                       actionButton(width = "49%", "btnChange", "Change cells"),
+                                       actionButton(width = "49%", "btnReset", "Reset map")
                                    ), 
                                    box(width = 12,
                                        actionButton(width = "100%", "recalc", "Recalculate services")
@@ -74,7 +75,8 @@ shinyUI(
 ## Maps                
                 tabItem(tabName = "outputMaps",
                         fluidRow(
-                            box(selectInput(inputId = "service",
+                            box(width = "100%", 
+                                selectInput(inputId = "service",
                                             label = "Select service:",
                                             choices = c('Food Provision - Meat' = 1,
                                                         'Food Provision - Crops' = 2,
@@ -90,6 +92,11 @@ shinyUI(
                                                         'Water Provision' = 12,
                                                         'PrimProdInputs' = 13)
                                             ))
+                        ),
+                        fluidRow(
+                            box(width = "100%",
+                                leafletOutput("serviceMap")
+                            )
                         )
                 )
             )
