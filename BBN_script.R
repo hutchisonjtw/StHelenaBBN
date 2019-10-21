@@ -95,8 +95,7 @@ targetNodes <- list('FoodProvMeat',
 testResults <- predict(object = stH_network, response = unlist(targetNodes), newdata = layersDFClass[complete.cases(layersDFClass),])
 
 predToRas <- function(x){
-    result <- as.factor(x) %>%
-        as.numeric()
+    result <- match(x, c("Low", "Medium", "High"))
     resultRasVals <- rep(NA, nrow(layersDF))
     resultRasVals[complete.cases(layersDFClass)] <- result
     resultRas <- setValues(checkStack$Altitude, resultRasVals)
@@ -106,3 +105,4 @@ predToRas <- function(x){
 resultsRaster <- lapply(testResults$pred, predToRas)
 resultsStack <- stack(resultsRaster)
 names(resultsStack) <- names(testResults$pred)
+writeRaster(resultsStack, bylayer = TRUE, filename = names(resultsStack), datatype = "INT1U")
