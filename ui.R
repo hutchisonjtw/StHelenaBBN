@@ -1,5 +1,3 @@
-library(shiny)
-library(shinydashboard)
 
 shinyUI(
     dashboardPage(
@@ -7,10 +5,11 @@ shinyUI(
         dashboardHeader(title = "St Helena Natural Capital Mapping Tool", titleWidth = 400),
 ## Sidebar        
         dashboardSidebar(
-            width = 200,
+            width = 220,
             sidebarMenu(
                 menuItem(text = "Land cover", tabName = "landcover", icon = icon("tree")),
-                menuItem(text = "Ecosystem service maps", tabName = "outputMaps", icon = icon("leaf"))
+                menuItem(text = "Ecosystem service maps", tabName = "outputMaps", icon = icon("leaf")),
+                menuItem(text = "Ecosystem service provision", tabName = "servicePlots", icon = icon("chart-bar"))
             )
         ),
 ## Body
@@ -74,31 +73,33 @@ shinyUI(
                 ),
 ## Maps                
                 tabItem(tabName = "outputMaps",
-                        fluidRow(
-                            box(width = "100%", 
-                                selectInput(inputId = "service",
-                                            label = "Select service:",
-                                            choices = c('Food Provision - Meat' = 1,
-                                                        'Food Provision - Crops' = 2,
-                                                        'Carbon Sequestration' = 3,
-                                                        'Coffee' = 4,
-                                                        'Honey' = 5,
-                                                        'Fuel' = 6,
-                                                        'Construction Materials' = 7,
-                                                        'Local Recreation' = 8,
-                                                        'Tourist Recreation' = 9,
-                                                        'Genetic/Medical Resources' = 10,
-                                                        'Reduction in Damage to Infrastructure & Property' = 11,
-                                                        'Water Provision' = 12,
-                                                        'PrimProdInputs' = 13)
-                                            ))
-                        ),
+                        # fluidRow(
+                        #     box(width = "100%", 
+                        #         selectInput(inputId = "service",
+                        #                     label = "Select service:",
+                        #                     choices = c('Food Provision - Meat' = 1,
+                        #                                 'Food Provision - Crops' = 2,
+                        #                                 'Carbon Sequestration' = 3,
+                        #                                 'Coffee' = 4,
+                        #                                 'Honey' = 5,
+                        #                                 'Fuel' = 6,
+                        #                                 'Construction Materials' = 7,
+                        #                                 'Local Recreation' = 8,
+                        #                                 'Tourist Recreation' = 9,
+                        #                                 'Genetic/Medical Resources' = 10,
+                        #                                 'Reduction in Damage to Infrastructure & Property' = 11,
+                        #                                 'Water Provision' = 12,
+                        #                                 'PrimProdInputs' = 13)
+                        #                     ))
+                        # ),
                         fluidRow(
                             box(width = "100%",
-                                leafletOutput("serviceMap")
+                                leafletOutput("serviceMap", height = 700)
                             )
                         )
-                )
+                ),
+                
+                tabItem(tabName = "servicePlots")
             )
         )
         
