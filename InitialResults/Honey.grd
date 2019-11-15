@@ -1,0 +1,26 @@
+[general]
+creator=R package 'raster'
+created=2019-11-15 10:38:23
+[georeference]
+nrows=163
+ncols=189
+xmin=200400
+ymin=8224500
+xmax=219300
+ymax=8240800
+projection=+proj=utm +zone=30 +south +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0
+[data]
+datatype=INT1U
+byteorder=little
+nbands=1
+bandorder=BIL
+categorical=FALSE
+minvalue=1
+maxvalue=3
+nodatavalue=NA
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=Honey
