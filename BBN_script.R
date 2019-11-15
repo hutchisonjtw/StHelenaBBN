@@ -53,6 +53,11 @@ sapply(layersFactor, levels)
 
 layersDF <- as.data.frame(checkStack)
 
+save(layersDF, file = "D:/St Helena/StHelenaBBN/inputLayersDF.r")
+
+habMap <- layersClean[[7]]
+writeRaster(habMap, file = "D:/St Helena/StHelenaBBN/habMap.grd", datatype = "INT1U")
+
 #IMPORT NETWORK
 stH_network <- loadNetwork('StH_BBN_draft1r6_181220.net')
 #stH_network
@@ -98,11 +103,11 @@ predToRas <- function(x){
     result <- match(x, c("Low", "Medium", "High"))
     resultRasVals <- rep(NA, nrow(layersDF))
     resultRasVals[complete.cases(layersDFClass)] <- result
-    resultRas <- setValues(checkStack$Altitude, resultRasVals)
+    resultRas <- setValues(habMap, resultRasVals)
     return(resultRas)
 }
 
 resultsRaster <- lapply(testResults$pred, predToRas)
 resultsStack <- stack(resultsRaster)
 names(resultsStack) <- names(testResults$pred)
-writeRaster(resultsStack, bylayer = TRUE, filename = names(resultsStack), datatype = "INT1U")
+writeRaster(resultsStack, bylayer = TRUE, filename = paste0("D:/St Helena/StHelenaBBN/InitialResults/", names(resultsStack)), datatype = "INT1U")
