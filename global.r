@@ -2,8 +2,15 @@ library(shiny)
 library(shinydashboard)
 library(raster)
 library(RColorBrewer)
+library(leaflet)
+library(bnspatial)
+library(tidyverse)
 
-habMap <- raster("D:/St Helena/BBN input layers/LandcoverType.tif")
+habMap <- raster("habMap.grd") %>%
+    {
+    NAvalue(.) <- 0
+    .
+    }
 
 habMapLatest <- habMap
 
@@ -28,3 +35,20 @@ zoomRatPlot <- function(map, zoomExt) {
     plot(mapFactor, col = levels(mapFactor)[[1]]$cols, legend = FALSE)
     legend("right", legend = levels(mapFactor)[[1]]$habitat, fill = levels(mapFactor)[[1]]$cols, xpd = TRUE, inset = -0.25, bty = "n")
 }
+
+## Read in environmental layers
+
+load("inputLayersDF.r")
+
+intervals_lk <- importClasses('D:/St Helena/BBN input layers/lookup_table_short.txt')
+
+## Read in initial ES layers
+
+resultLayers <- c("FoodProvMeat", "FoodProvVeg", "CarbonSequestration", "Coffee", "Honey", "Fuel", "ConstructionMaterials", "RecreationLocal", "RecreationTourists", "GeneticMedicalResources", "ReductionDamageInfraProperty", "WaterProvision", "PrimProdInputs")
+initialResults <- lapply(paste0("InitialResults/", resultLayers), raster) %>%
+    stack() %>%
+    {
+        NAvalue(.) <- 0
+        .
+    }
+
