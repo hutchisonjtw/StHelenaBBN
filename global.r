@@ -42,6 +42,9 @@ load("inputLayersDF.r")
 
 intervals_lk <- importClasses('D:/St Helena/BBN input layers/lookup_table_short.txt')
 
+## Read in network
+stH_network <- loadNetwork('StH_BBN_draft1r6_181220.net')
+
 ## Read in initial ES layers
 
 resultLayers <- c("FoodProvMeat", "FoodProvVeg", "CarbonSequestration", "Coffee", "Honey", "Fuel", "ConstructionMaterials", "RecreationLocal", "RecreationTourists", "GeneticMedicalResources", "ReductionDamageInfraProperty", "WaterProvision", "PrimProdInputs")
@@ -51,4 +54,13 @@ initialResults <- lapply(paste0("InitialResults/", resultLayers), raster) %>%
         NAvalue(.) <- 0
         .
     }
+
+## Function to convert results of running network back to Raster
+predToRas <- function(x){
+    result <- match(x, c("Low", "Medium", "High"))
+    resultRasVals <- rep(NA, nrow(layersDF))
+    resultRasVals[complete.cases(layersDFClass)] <- result
+    resultRas <- setValues(habMap, resultRasVals)
+    return(resultRas)
+}
 
