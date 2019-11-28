@@ -66,7 +66,7 @@ shinyUI(
                                        actionButton(width = "49%", "btnReset", "Reset map")
                                    ), 
                                    box(width = 12,
-                                       actionButton(width = "100%", "recalc", "Recalculate services")
+                                       actionButton(width = "100%", "btnRecalc", "Recalculate services")
                                    )
                             )
                         )
