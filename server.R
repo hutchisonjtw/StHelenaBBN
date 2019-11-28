@@ -13,6 +13,8 @@ shinyServer(function(input, output) {
     
     #habMapMat <- reactive(as.matrix(habMapPlot$map))
     
+    results <- reactiveValues(resultsStack = initialResults)
+    
     
 ## Plot map, with zoom if boundary drawn - tried re-writing this with rasterVis::levelplot, but it uses lattice graphics and the plotOutput brush function does not return the plot coordinates with lattice graphics so cannot be used to interact with the raster.    
     output$habMap <- renderPlot({
@@ -85,10 +87,10 @@ shinyServer(function(input, output) {
         if (!is.null(brush)) {
             brushBox$update <- extent(c(brush$xmin, brush$xmax, brush$ymin, brush$ymax))
             habMapUpdate <- habMapPlot$map
-            cells <- cellsFromExtent(habMapUpdate, brushBox$update)
-            vals <- habMapUpdate[cells]
+            boundary$cells <- cellsFromExtent(habMapUpdate, brushBox$update)
+            vals <- habMapUpdate[boundary$cells]
             vals[vals==input$fromClass] <- as.numeric(input$toClass)
-            habMapUpdate[cells] <- vals
+            habMapUpdate[boundary$cells] <- vals
             habMapPlot$map <- habMapUpdate
             #writeRaster(habMapPlot, file = "D:/St Helena/habmap.tif", overwrite = TRUE)
         } else {
@@ -102,36 +104,66 @@ shinyServer(function(input, output) {
         habMapPlot$map <- habMap
     })
     
+    observeEvent(input$btnRecalc, {
+        layersDF$LandCoverType <- getValues(habMapPlot$map)
+        layersDFClass <- layersDF
+        for(i in 1:ncol(layersDF)) {
+            layersDFClass[ , i] <- intervals_lk[[names(layersDF)[i]]]$States[layersDF[ , i]]
+        }
+        targetNodes <- list('FoodProvMeat',
+                            'FoodProvVeg',
+                            'CarbonSequestration',
+                            'Coffee',
+                            'Honey',
+                            'Fuel',
+                            'ConstructionMaterials',
+                            'RecreationLocal',
+                            'RecreationTourists',
+                            'GeneticMedicalResources',
+                            'ReductionDamageInfraProperty',
+                            'WaterProvision',
+                            'PrimProdInputs'
+        )
+        testResults <- predict(object = stH_network, response = unlist(targetNodes), newdata = layersDFClass[complete.cases(layersDFClass),])
+        testResultsStack <- lapply(testResults$pred, predToRas) %>%
+            stack()
+        results$resultsStack <- testResultsStack
+    })
+        
+        
+        
+        
+    
     output$serviceMap <- renderLeaflet({
         leaflet() %>%
             fitBounds(lng1 = -5.8045, lat1 = -16.04712, lng2 = -5.616973, lat2 = -15.8891) %>%
             addProviderTiles(providers$OpenStreetMap.Mapnik) %>%
-            addRasterImage(as.factor(habMapPlot$map), colors = rev(brewer.pal(10, "Paired")), group = "habMap") %>%
-            addRasterImage(initialResults$FoodProvMeat, colors = brewer.pal(3, "Purples"), group = "Food Provision - meat") %>%
+            addRasterImage(as.factor(isolate(habMapPlot$map)), colors = rev(brewer.pal(10, "Paired")), group = "habMap") %>%
+            addRasterImage(x=isolate(results$resultsStack)$FoodProvMeat, colors = brewer.pal(3, "Purples"), group = "Food Provision - meat") %>%
             hideGroup("Food Provision - meat") %>%
-            addRasterImage(initialResults$FoodProvVeg, colors = brewer.pal(3, "Purples"), group = "Food Provision - vegetables") %>%
+            addRasterImage((results$resultsStack)$FoodProvVeg, colors = brewer.pal(3, "Purples"), group = "Food Provision - vegetables") %>%
             hideGroup("Food Provision - vegetables") %>%
-            addRasterImage(initialResults$CarbonSequestration, colors = brewer.pal(3, "Purples"), group = "Carbon sequestration") %>%
+            addRasterImage((results$resultsStack)$CarbonSequestration, colors = brewer.pal(3, "Purples"), group = "Carbon sequestration") %>%
             hideGroup("Carbon sequestration") %>%
-            addRasterImage(initialResults$Coffee, colors = brewer.pal(3, "Purples"), group = "Coffee") %>%
+            addRasterImage((results$resultsStack)$Coffee, colors = brewer.pal(3, "Purples"), group = "Coffee") %>%
             hideGroup("Coffee") %>%
-            addRasterImage(initialResults$Honey, colors = brewer.pal(3, "Purples"), group = "Honey") %>%
+            addRasterImage((results$resultsStack)$Honey, colors = brewer.pal(3, "Purples"), group = "Honey") %>%
             hideGroup("Honey") %>%
-            addRasterImage(initialResults$Fuel, colors = brewer.pal(3, "Purples"), group = "Firewood") %>%
+            addRasterImage((results$resultsStack)$Fuel, colors = brewer.pal(3, "Purples"), group = "Firewood") %>%
             hideGroup("Firewood") %>%
-            addRasterImage(initialResults$ConstructionMaterials, colors = brewer.pal(3, "Purples"), group = "Timber") %>%
+            addRasterImage((results$resultsStack)$ConstructionMaterials, colors = brewer.pal(3, "Purples"), group = "Timber") %>%
             hideGroup("Timber") %>%
-            addRasterImage(initialResults$RecreationLocal, colors = brewer.pal(3, "Purples"), group = "Recreation (Residents)") %>%
+            addRasterImage((results$resultsStack)$RecreationLocal, colors = brewer.pal(3, "Purples"), group = "Recreation (Residents)") %>%
             hideGroup("Recreation (Residents)") %>%
-            addRasterImage(initialResults$RecreationTourists, colors = brewer.pal(3, "Purples"), group = "Recreation (Tourists)") %>%
+            addRasterImage(results$resultsStack$RecreationTourists, colors = brewer.pal(3, "Purples"), group = "Recreation (Tourists)") %>%
             hideGroup("Recreation (Tourists)") %>%
-            addRasterImage(initialResults$GeneticMedicalResources, colors = brewer.pal(3, "Purples"), group = "Genetic & Medical resources") %>%
+            addRasterImage((results$resultsStack)$GeneticMedicalResources, colors = brewer.pal(3, "Purples"), group = "Genetic & Medical resources") %>%
             hideGroup("Genetic & Medical resources") %>%
-            addRasterImage(initialResults$ReductionDamageInfraProperty, colors = brewer.pal(3, "Purples"), group = "Environmental hazard mitigation") %>%
+            addRasterImage((results$resultsStack)$ReductionDamageInfraProperty, colors = brewer.pal(3, "Purples"), group = "Environmental hazard mitigation") %>%
             hideGroup("Environmental hazard mitigation") %>%
-            addRasterImage(initialResults$WaterProvision, colors = brewer.pal(3, "Purples"), group = "Water provision") %>%
+            addRasterImage((results$resultsStack)$WaterProvision, colors = brewer.pal(3, "Purples"), group = "Water provision") %>%
             hideGroup("Water provision") %>%
-            addRasterImage(initialResults$PrimProdInputs, colors = brewer.pal(3, "Purples"), group = "Inputs to primary productivity") %>%
+            addRasterImage((results$resultsStack)$PrimProdInputs, colors = brewer.pal(3, "Purples"), group = "Inputs to primary productivity") %>%
             hideGroup("Inputs to primary productivity") %>%
             addLayersControl(overlayGroups = c("habMap", "Food Provision - meat", "Food Provision - vegetables", "Carbon sequestration", "Coffee", "Honey", "Firewood", "Timber", "Recreation (Residents)", "Recreation (Tourists)", "Genetic & Medical resources", "Environmental hazard mitigation", "Water provision", "Inputs to primary productivity"),
                              options = layersControlOptions(collapsed = FALSE)) %>%
