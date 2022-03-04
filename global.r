@@ -40,7 +40,7 @@ zoomRatPlot <- function(map, zoomExt) {
 
 load("inputLayersDF.r")
 
-intervals_lk <- importClasses('D:/St Helena/BBN input layers/lookup_table_short.txt')
+intervals_lk <- importClasses('lookup_table_short.txt')
 
 ## Read in network
 stH_network <- loadNetwork('StH_BBN_draft1r6_181220.net')

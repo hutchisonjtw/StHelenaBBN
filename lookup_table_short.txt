@@ -1,0 +1,40 @@
+Altitude
+Above_690m, Between_500_and_690m, Between_300_and_500m, Below_300m
+1, 2, 3, 4
+Aspect
+North_East, South_East, South_West, North_West
+1, 2, 3, 4
+DistancePath
+High, Medium, Low
+1, 2, 3
+DistanceRoad
+High, Medium, Low
+1, 2, 3
+DistanceSettlement
+High, Medium, Low
+1, 2, 3
+ForestEstate
+Firewood, Timber, Dual_purpose, Other
+1, 2, 3, 4
+LandCoverType
+Native_forest, Introduced_forest, Native_shrubland, Introduced_shrubland, Introduced_shrubland_flax, Introduced_arable, Introduced_pasture, Introduced_plantations, Rural_gardens, Other
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+LandscapeBiodiversity
+High, Medium, Low
+3, 2, 1
+Slope
+Low, Moderate, Moderate_high, High, Very_high
+5, 4, 3, 2, 1
+SoilCarbon
+Good, Moderate, Bad
+3, 2, 1
+SoilpH
+Good, Moderate, Bad
+3, 2, 1
+SoilStability
+Stable, Moderate, Very_unstable
+3, 2, 1
+
+
+
+
